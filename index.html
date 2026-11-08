@@ -88,6 +88,14 @@ canvas.wave { width: 100%; height: 88px; display: block; background: var(--surfa
 .ts { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); padding-top: 3px; background: none; border: 0; text-align: left; padding-left: 0; }
 button.ts:hover { color: var(--rec); }
 .interim { color: var(--muted); font-style: italic; }
+.mic { background: var(--surface); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.seg-ctl { display: grid; grid-template-columns: 1fr 1fr; background: var(--chip); border-radius: 11px; padding: 3px; }
+.seg-ctl button { border: 0; background: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; color: var(--muted); }
+.seg-ctl button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.mic-hint { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.boost { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; font-size: 0.9rem; font-weight: 600; }
+.boost input { width: 100%; accent-color: var(--rec); }
+.boost output { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); min-width: 3.2em; text-align: right; }
 .notice { background: var(--mark); color: var(--mark-ink); border-radius: 12px; padding: 12px 14px; font-size: 0.9rem; }
 
 .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 0.85rem; }
@@ -131,6 +139,14 @@ details summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; color: v
     </div>
     <div class="clock" id="clock">00:00</div>
     <canvas class="wave" id="wave" aria-hidden="true"></canvas>
+    <div class="mic">
+      <div class="seg-ctl" role="group" aria-label="Microphone mode">
+        <button id="mode-voice" data-mode="voice">Voice</button>
+        <button id="mode-room" data-mode="room">Room</button>
+      </div>
+      <p class="mic-hint" id="mode-hint"></p>
+      <label class="boost" for="boost">Boost <input type="range" id="boost" min="1" max="4" step="0.25"> <output id="boost-val"></output></label>
+    </div>
     <div id="rec-notice" class="notice" hidden></div>
     <div class="label">Live transcript</div>
     <div class="live-tx" id="live-tx"><span class="muted">Words appear here as you talk.</span></div>
@@ -253,8 +269,36 @@ function renderList() {
 }
 $("#q").addEventListener("input", renderList);
 
+/* ---------- mic settings ---------- */
+const MIC_KEY = "earmark.mic.v1";
+const MODES = {
+  voice: { hint: "Best for one person close to the phone. Filters out background noise and echo.", c: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } },
+  room: { hint: "Picks up the whole room, including quieter voices farther away. Expect more background noise.", c: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }
+};
+let mic = { mode: "voice", boost: 1.5 };
+try { mic = Object.assign(mic, JSON.parse(localStorage.getItem(MIC_KEY) || "{}")); } catch {}
+if (!MODES[mic.mode]) mic.mode = "voice";
+mic.boost = Math.min(4, Math.max(1, Number(mic.boost) || 1.5));
+function saveMic() { try { localStorage.setItem(MIC_KEY, JSON.stringify(mic)); } catch {} }
+function renderMic() {
+  for (const m of ["voice", "room"]) $("#mode-" + m).setAttribute("aria-pressed", String(mic.mode === m));
+  $("#mode-hint").textContent = MODES[mic.mode].hint;
+  $("#boost").value = mic.boost;
+  $("#boost-val").textContent = mic.boost.toFixed(2).replace(/0$/, "") + "×";
+}
+document.querySelectorAll(".seg-ctl button").forEach((b) => b.addEventListener("click", async () => {
+  mic.mode = b.dataset.mode; saveMic(); renderMic();
+  const track = R.stream?.getAudioTracks()[0];
+  if (track) { try { await track.applyConstraints(MODES[mic.mode].c); } catch { toast("This mode starts with your next recording."); } }
+}));
+$("#boost").addEventListener("input", (e) => {
+  mic.boost = Number(e.target.value); saveMic(); renderMic();
+  if (R.gain && R.ctx) R.gain.gain.setTargetAtTime(mic.boost, R.ctx.currentTime, 0.05);
+});
+renderMic();
+
 /* ---------- recorder ---------- */
-const R = { stream: null, mr: null, chunks: [], ctx: null, an: null, raf: 0, start: 0, elapsed: 0, timer: 0, sr: null, segs: [], interim: "", live: false, levels: [] };
+const R = { stream: null, mr: null, chunks: [], ctx: null, an: null, gain: null, raf: 0, start: 0, elapsed: 0, timer: 0, sr: null, segs: [], interim: "", live: false, levels: [] };
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 $("#btn-rec").addEventListener("click", () => {
@@ -272,24 +316,41 @@ async function startRecording() {
   $("#rec-notice").hidden = true;
   show("rec");
   setStatus("Starting…", false);
+  // Create the audio context during the tap so iPhone lets it run.
+  try { R.ctx = new (window.AudioContext || window.webkitAudioContext)(); R.ctx.resume?.(); } catch { R.ctx = null; }
   try {
     if (!navigator.mediaDevices?.getUserMedia) throw new Error("nomedia");
-    R.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    R.stream = await navigator.mediaDevices.getUserMedia({ audio: { ...MODES[mic.mode].c, channelCount: 1, sampleRate: 48000 } });
   } catch (e) {
+    try { R.ctx && R.ctx.close(); } catch {} R.ctx = null;
     setStatus("No microphone", false);
     $("#dock").hidden = true;
     const n = $("#rec-notice"); n.hidden = false;
     n.textContent = "Earmark can’t reach the microphone. On iPhone, go to Settings → Safari → Microphone and choose Ask or Allow, then try again.";
     return;
   }
+  // Signal chain: mic -> boost -> leveler (evens loud and soft voices) -> limiter (stops clipping) -> recorder + meter
+  let recStream = R.stream;
+  R.an = null; R.gain = null;
+  if (R.ctx) {
+    try {
+      await R.ctx.resume?.();
+      const src = R.ctx.createMediaStreamSource(R.stream);
+      R.gain = R.ctx.createGain(); R.gain.gain.value = mic.boost;
+      const level = R.ctx.createDynamicsCompressor();
+      level.threshold.value = -30; level.knee.value = 20; level.ratio.value = 3; level.attack.value = 0.005; level.release.value = 0.3;
+      const limit = R.ctx.createDynamicsCompressor();
+      limit.threshold.value = -3; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = 0.001; limit.release.value = 0.1;
+      R.an = R.ctx.createAnalyser(); R.an.fftSize = 1024;
+      const dest = R.ctx.createMediaStreamDestination();
+      src.connect(R.gain); R.gain.connect(level); level.connect(limit); limit.connect(R.an); limit.connect(dest);
+      if (R.ctx.state === "running") recStream = dest.stream;
+    } catch { R.an = null; R.gain = null; recStream = R.stream; }
+  }
   const mime = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/aac"].find((m) => window.MediaRecorder?.isTypeSupported?.(m)) || "";
-  try { R.mr = new MediaRecorder(R.stream, mime ? { mimeType: mime } : undefined); } catch { R.mr = null; }
+  const opts = { audioBitsPerSecond: 128000 }; if (mime) opts.mimeType = mime;
+  try { R.mr = new MediaRecorder(recStream, opts); } catch { try { R.mr = new MediaRecorder(R.stream); } catch { R.mr = null; } }
   if (R.mr) { R.mr.ondataavailable = (e) => e.data.size && R.chunks.push(e.data); R.mr.start(1000); }
-  try {
-    R.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const src = R.ctx.createMediaStreamSource(R.stream);
-    R.an = R.ctx.createAnalyser(); R.an.fftSize = 1024; src.connect(R.an);
-  } catch { R.an = null; }
   R.live = true; R.start = performance.now();
   setStatus("Recording", true);
   R.timer = setInterval(() => { $("#clock").textContent = fmt(curTime()); }, 250);
