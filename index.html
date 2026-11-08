@@ -154,6 +154,7 @@ details.panel summary::after { content: "+"; font-size: 1.2rem; color: var(--mut
 details.panel[open] summary::after { content: "–"; }
 textarea { width: 100%; min-height: 180px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 12px; padding: 12px 14px; font: inherit; line-height: 1.5; resize: vertical; }
 .btn { align-self: flex-start; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 0.88rem; }
+.backup-row { display: flex; justify-content: center; gap: 8px; padding-top: 6px; }
 .actionbar { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px max(18px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)); background: linear-gradient(to top, var(--bg) 55%, transparent); z-index: 10; }
 .send { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 444px; margin: 0 auto; border: 0; border-radius: 16px; padding: 16px 18px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 1.02rem; box-shadow: var(--shadow); }
 .send svg { width: 20px; height: 20px; }
@@ -180,6 +181,11 @@ textarea { width: 100%; min-height: 180px; border: 1px solid var(--line); backgr
       <input id="q" type="search" placeholder="Search transcripts" aria-label="Search transcripts">
     </div>
     <div id="notes" class="view" style="gap:22px"></div>
+    <div class="backup-row">
+      <button class="btn" id="btn-backup">Back up</button>
+      <button class="btn" id="btn-restore">Restore</button>
+      <input type="file" id="restore-file" accept="application/json,.json" hidden>
+    </div>
   </section>
 
   <!-- RECORDER -->
@@ -226,6 +232,7 @@ textarea { width: 100%; min-height: 180px; border: 1px solid var(--line); backgr
         <span class="ptime" id="ptime">00:00</span>
       </div>
       <audio id="n-audio" preload="metadata"></audio>
+      <button class="btn" id="n-share-audio" hidden>Share audio</button>
     </div>
     <div class="panel">
       <div class="eyebrow">Transcript</div>
@@ -463,6 +470,7 @@ async function startRecording() {
   try { R.mr = new MediaRecorder(recStream, opts); } catch { try { R.mr = new MediaRecorder(R.stream); } catch { R.mr = null; } }
   if (R.mr) { R.mr.ondataavailable = (e) => e.data.size && R.chunks.push(e.data); R.mr.start(1000); }
   R.live = true; R.start = performance.now();
+  keepAwake();
   setStatus("Rec", true);
   $("#clock-sub").textContent = "Tap the button to stop and save";
   R.timer = setInterval(() => { $("#clock").textContent = fmt(curTime()); }, 250);
@@ -470,6 +478,20 @@ async function startRecording() {
   startSpeech();
 }
 function curTime() { return R.elapsed + (R.live ? (performance.now() - R.start) / 1000 : 0); }
+
+/* Keep the screen on while recording; iPhone drops the lock whenever the page is hidden. */
+async function keepAwake() { try { R.lock = await navigator.wakeLock.request("screen"); } catch { R.lock = null; } }
+function releaseAwake() { try { R.lock && R.lock.release(); } catch {} R.lock = null; }
+document.addEventListener("visibilitychange", () => {
+  if (!R.live) return;
+  if (document.hidden) { R.hiddenAt = curTime(); return; }
+  keepAwake();
+  if (R.hiddenAt != null) {
+    const n = $("#rec-notice"); n.hidden = false;
+    n.textContent = "Earmark was in the background at " + fmt(R.hiddenAt) + ". The recording may have a gap or stop there.";
+    R.hiddenAt = null;
+  }
+});
 
 function startSpeech() {
   if (!SR) { const n = $("#rec-notice"); n.hidden = false; n.textContent = "This browser records audio but can’t transcribe live. The audio is still saved, and you can type the transcript in the note."; return; }
@@ -526,7 +548,7 @@ function drawWave() {
 }
 function stopRecording(keep) {
   const duration = curTime();
-  R.live = false; clearInterval(R.timer); cancelAnimationFrame(R.raf);
+  R.live = false; R.hiddenAt = null; releaseAwake(); clearInterval(R.timer); cancelAnimationFrame(R.raf);
   const sr = R.sr; R.sr = null; try { sr && sr.stop(); } catch {}
   if (R.interim.trim()) { R.segs.push({ t: Math.max(0, Math.floor(duration - 3)), text: R.interim.trim() }); R.interim = ""; }
   const finish = () => {
@@ -575,6 +597,7 @@ async function openNote(id) {
 }
 function setPlayable(ok) {
   $("#play").hidden = !ok;
+  $("#n-share-audio").hidden = !ok;
   $("#play").innerHTML = ICON_PLAY;
   const n = notes.find((x) => x.id === current);
   $("#ptime").textContent = fmt(n?.duration);
@@ -631,6 +654,60 @@ $("#tx-save").addEventListener("click", () => {
   delete n.example; save(); renderNote(); toast("Transcript saved");
 });
 
+/* ---------- files: backup, restore, share audio ---------- */
+async function shareFile(file) {
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); return true; }
+    catch (e) { if (e && e.name === "AbortError") return false; }
+  }
+  const url = URL.createObjectURL(file), a = document.createElement("a");
+  a.href = url; a.download = file.name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  return true;
+}
+const toDataURL = (blob) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+async function buildBackup() {
+  const audio = {};
+  for (const n of notes) if (n.hasAudio) { const b = await getAudio(n.id); if (b) audio[n.id] = await toDataURL(b); }
+  return { app: "earmark", version: 1, exported: new Date().toISOString(), notes, audio };
+}
+$("#btn-backup").addEventListener("click", async () => {
+  if (!notes.length) { toast("There are no notes to back up yet."); return; }
+  toast("Preparing backup…", 8000);
+  const data = await buildBackup();
+  const file = new File([JSON.stringify(data)], "earmark-backup-" + new Date().toISOString().slice(0, 10) + ".json", { type: "application/json" });
+  if (await shareFile(file)) toast("Backed up " + notes.length + (notes.length === 1 ? " note" : " notes") + ". Keep the file somewhere safe, like iCloud Drive.", 4000);
+  else $("#toast").hidden = true;
+});
+$("#btn-restore").addEventListener("click", () => $("#restore-file").click());
+$("#restore-file").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch { data = null; }
+  if (!data || data.app !== "earmark" || !Array.isArray(data.notes)) { toast("That file isn’t an Earmark backup."); return; }
+  const have = new Set(notes.map((n) => n.id));
+  let added = 0, skipped = 0;
+  for (const n of data.notes) {
+    if (!n || !n.id || !Array.isArray(n.transcript)) continue;
+    if (have.has(n.id)) { skipped++; continue; }
+    const src = data.audio?.[n.id];
+    if (n.hasAudio && typeof src === "string" && src.startsWith("data:")) {
+      try { await putAudio(n.id, await (await fetch(src)).blob()); } catch { n.hasAudio = false; }
+    } else n.hasAudio = false;
+    notes.push(n); have.add(n.id); added++;
+  }
+  save(); renderList();
+  toast("Restored " + added + (added === 1 ? " note" : " notes") + (skipped ? " (" + skipped + " already here)" : "") + ".", 3500);
+});
+$("#n-share-audio").addEventListener("click", async () => {
+  const n = notes.find((x) => x.id === current); if (!n) return;
+  const blob = await getAudio(n.id); if (!blob) { toast("No audio saved for this note."); return; }
+  const t = blob.type || "";
+  const ext = /mp4|aac|m4a/.test(t) ? ".m4a" : /webm/.test(t) ? ".webm" : /mpeg|mp3/.test(t) ? ".mp3" : /wav/.test(t) ? ".wav" : ".audio";
+  const name = (titleOf(n).replace(/[\\/:*?"<>|]+/g, "").trim().slice(0, 60) || "Earmark recording") + ext;
+  await shareFile(new File([blob], name, { type: t || "application/octet-stream" }));
+});
+
 /* ---------- send to Claude ---------- */
 function transcriptText(n) {
   const head = "Transcript of my voice note “" + titleOf(n) + "” (" + new Date(n.created).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) + ", " + fmt(n.duration) + "):";
@@ -667,6 +744,7 @@ $("#n-del").addEventListener("click", () => {
 
 /* ---------- boot ---------- */
 load(); seed(); renderList(); show("list");
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 })();
 </script>
 </body>
