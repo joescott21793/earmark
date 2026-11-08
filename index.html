@@ -3,22 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Earmark</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Earmark">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ECEEF2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1014" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" type="image/png" href="icon.png">
-<style>
-:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-body { margin: 0; }
-img { max-width: 100%; }
-[hidden] { display: none !important; }
-</style>
-</head>
-<body>
-<title>Earmark</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Earmark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
@@ -37,16 +30,17 @@ img { max-width: 100%; }
   --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --body: "Figtree", -apple-system, "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+@media (prefers-color-scheme: dark) { :root {
   --bg: #0E1014; --surface: #181B22; --ink: #ECEEF2; --muted: #98A0AE; --line: #2A2F3A;
   --rec: #FF5244; --rec-ink: #FFFFFF; --mark: #463A12; --mark-ink: #FFE7A0; --chip: #232733; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #0E1014; --surface: #181B22; --ink: #ECEEF2; --muted: #98A0AE; --line: #2A2F3A;
-  --rec: #FF5244; --rec-ink: #FFFFFF; --mark: #463A12; --mark-ink: #FFE7A0; --chip: #232733; color-scheme: dark }
 
+[hidden] { display: none !important; }
 html, body { height: 100%; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
 * { box-sizing: border-box; }
 button { font: inherit; color: inherit; cursor: pointer; }
 button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--rec); outline-offset: 2px; }
@@ -54,25 +48,25 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
 h1 { font-size: 2.1rem; line-height: 1.1; font-weight: 700; }
 h2 { font-size: 1.45rem; line-height: 1.2; font-weight: 700; }
-.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .small { font-size: 0.82rem; }
 .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.panel { display: flex; flex-direction: column; gap: 14px; }
 
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .iconbtn { background: none; border: 0; padding: 8px; margin: -8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 4px; color: var(--ink); }
 .iconbtn svg { width: 22px; height: 22px; }
 .search { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; font: inherit; color: var(--ink); }
 
-.notes { display: flex; flex-direction: column; gap: 0; background: var(--surface); border-radius: 16px; overflow: hidden; }
+.notes { display: flex; flex-direction: column; background: var(--surface); border-radius: 16px; overflow: hidden; }
 .note-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 16px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; }
 .note-row:last-child { border-bottom: 0; }
-.note-row:hover { background: color-mix(in srgb, var(--chip) 50%, transparent); }
-.note-row .t { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-row .t { font-weight: 600; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.note-row .t span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .note-row .d { color: var(--muted); font-size: 0.82rem; }
 .note-row .p { grid-column: 1 / -1; color: var(--muted); font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.pill { display: inline-block; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--muted); vertical-align: 2px; margin-left: 6px; }
-.pill.ex { background: var(--mark); color: var(--mark-ink); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pill { flex: none; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--mark); color: var(--mark-ink); }
 .empty { text-align: center; padding: 40px 16px; color: var(--muted); }
 
 .dock { position: fixed; left: 0; right: 0; bottom: 0; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); padding-top: 14px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; justify-content: center; align-items: center; gap: 28px; background: linear-gradient(to top, var(--bg) 60%, transparent); }
@@ -80,66 +74,39 @@ h2 { font-size: 1.45rem; line-height: 1.2; font-weight: 700; }
 .recbtn span { width: 26px; height: 26px; border-radius: 50%; background: var(--rec-ink); transition: border-radius .2s, transform .2s; }
 .recbtn.live span { border-radius: 5px; transform: scale(.85); }
 .sidebtn { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font-size: 0.9rem; font-weight: 500; white-space: nowrap; }
-@media (max-width: 420px) { .dock { gap: 14px; } .sidebtn { padding: 10px 12px; font-size: 0.85rem; } }
+.dock .spacer { width: 120px; }
+@media (max-width: 420px) { .dock { gap: 14px; } .sidebtn { padding: 10px 12px; font-size: 0.85rem; } .dock .spacer { width: 104px; } }
 
-/* recorder */
-.rec-head { display: flex; justify-content: space-between; align-items: baseline; }
 .clock { font-family: var(--mono); font-size: 3.2rem; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .status { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
 .dot.on { background: var(--rec); animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: .25; } }
 canvas.wave { width: 100%; height: 88px; display: block; background: var(--surface); border-radius: 14px; }
-.live-tx { background: var(--surface); border-radius: 14px; padding: 14px 16px; min-height: 160px; max-height: 40vh; overflow-y: auto; }
-.live-tx .seg { display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding: 3px 0; }
-.live-tx .ts { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); padding-top: 3px; }
-.live-tx .interim { color: var(--muted); font-style: italic; }
+.live-tx { background: var(--surface); border-radius: 14px; padding: 14px 16px; min-height: 160px; max-height: 45vh; overflow-y: auto; }
+.seg { display: grid; grid-template-columns: 52px 1fr; gap: 10px; padding: 3px 0; }
+.ts { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); padding-top: 3px; background: none; border: 0; text-align: left; padding-left: 0; }
+button.ts:hover { color: var(--rec); }
+.interim { color: var(--muted); font-style: italic; }
 .notice { background: var(--mark); color: var(--mark-ink); border-radius: 12px; padding: 12px 14px; font-size: 0.9rem; }
-textarea { width: 100%; min-height: 200px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 12px 14px; font: inherit; resize: vertical; }
-.styles { display: flex; gap: 8px; flex-wrap: wrap; }
-.chipbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 0.85rem; }
-.chipbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-/* note detail */
 .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 0.85rem; }
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--chip); border-radius: 12px; padding: 3px; }
-.tabs button { border: 0; background: none; padding: 8px; border-radius: 9px; font-weight: 600; font-size: 0.9rem; color: var(--muted); }
-.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.panel { display: flex; flex-direction: column; gap: 14px; }
 .card { background: var(--surface); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.card p { margin: 0; }
-.card ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
-.todo { list-style: none; padding: 0 !important; }
-.todo li { display: flex; gap: 10px; align-items: flex-start; }
-.todo input { margin-top: 5px; accent-color: var(--rec); width: 17px; height: 17px; flex: none; }
-.todo li.done span { text-decoration: line-through; color: var(--muted); }
-mark { background: var(--mark); color: var(--mark-ink); padding: 0 3px; border-radius: 3px; }
-.tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.tag { font-size: 0.78rem; background: var(--chip); color: var(--muted); padding: 3px 9px; border-radius: 999px; }
 .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 0.88rem; }
-.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn.danger { color: var(--rec); }
-.btn:disabled { opacity: .5; cursor: default; }
-.thinking { color: var(--muted); display: flex; align-items: center; gap: 10px; }
-.thinking::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--rec); animation: spin .8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.tx-list { display: flex; flex-direction: column; gap: 10px; }
-.tx-list .seg { display: grid; grid-template-columns: 52px 1fr; gap: 10px; }
-.tx-list .ts { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); padding-top: 3px; background: none; border: 0; text-align: left; padding-left: 0; }
-.tx-list .ts:hover { color: var(--rec); }
+.send { width: 100%; border: 0; border-radius: 14px; padding: 15px 18px; background: var(--ink); color: var(--bg); font-weight: 600; font-size: 1.02rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.send svg { width: 20px; height: 20px; }
+.send:disabled { opacity: .45; cursor: default; }
+textarea { width: 100%; min-height: 180px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 12px 14px; font: inherit; resize: vertical; }
 audio { width: 100%; }
-.chat { display: flex; flex-direction: column; gap: 10px; }
-.bubble { max-width: 88%; padding: 10px 14px; border-radius: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.bubble.me { align-self: flex-end; background: var(--ink); color: var(--bg); border-bottom-right-radius: 5px; }
-.bubble.ai { align-self: flex-start; background: var(--surface); border-bottom-left-radius: 5px; }
-.askbar { display: flex; gap: 8px; }
-.askbar input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 14px; font: inherit; }
-.suggest { display: flex; gap: 6px; flex-wrap: wrap; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(120px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 0.88rem; font-weight: 500; z-index: 20; }
+details summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--muted); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(40px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 14px; font-size: 0.88rem; font-weight: 500; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+.toast a { color: inherit; font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
-
+</head>
+<body>
 <div class="app">
 
   <!-- LIST VIEW -->
@@ -151,7 +118,7 @@ audio { width: 100%; }
       </div>
       <span class="small muted" id="count"></span>
     </div>
-    <input id="q" class="search" type="search" placeholder="Search notes and transcripts" aria-label="Search notes">
+    <input id="q" class="search" type="search" placeholder="Search transcripts" aria-label="Search notes">
     <div id="notes" class="notes"></div>
   </section>
 
@@ -167,57 +134,34 @@ audio { width: 100%; }
     <div id="rec-notice" class="notice" hidden></div>
     <div class="label">Live transcript</div>
     <div class="live-tx" id="live-tx"><span class="muted">Words appear here as you talk.</span></div>
-    <div class="label">Summary style</div>
-    <div class="styles" id="rec-styles"></div>
-  </section>
-
-  <!-- PASTE VIEW -->
-  <section id="view-paste" class="panel" hidden>
-    <div class="topbar">
-      <button class="iconbtn" data-go="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>Notes</button>
-    </div>
-    <h2>Add a transcript</h2>
-    <p class="muted small" style="margin:0">Paste text from a call, a Voice Memos transcript, or type it out. Earmark summarizes it the same way as a recording.</p>
-    <textarea id="paste-text" placeholder="Paste or type the conversation here…"></textarea>
-    <div class="label">Summary style</div>
-    <div class="styles" id="paste-styles"></div>
-    <div class="row"><button class="btn primary" id="paste-save">Summarize</button></div>
   </section>
 
   <!-- NOTE VIEW -->
   <section id="view-note" class="panel" hidden>
     <div class="topbar">
-      <button class="iconbtn" data-go="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>Notes</button>
-      <div class="row">
-        <button class="btn" id="n-copy">Copy</button>
-        <button class="btn danger" id="n-del">Delete</button>
-      </div>
+      <button class="iconbtn" id="n-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>Notes</button>
+      <button class="btn danger" id="n-del">Delete</button>
     </div>
     <div>
       <h2 id="n-title"></h2>
       <div class="meta" id="n-meta"></div>
     </div>
+    <button class="send" id="n-send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+      Send transcript to Claude
+    </button>
     <audio id="n-audio" controls hidden></audio>
-    <div class="tabs" role="tablist">
-      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
-      <button role="tab" data-tab="transcript" aria-selected="false">Transcript</button>
-      <button role="tab" data-tab="ask" aria-selected="false">Ask</button>
-    </div>
-    <div id="tab-summary" class="panel"></div>
-    <div id="tab-transcript" class="panel" hidden></div>
-    <div id="tab-ask" class="panel" hidden>
-      <div class="chat" id="chat"></div>
-      <div class="suggest" id="suggest"></div>
-      <form class="askbar" id="askform">
-        <input id="askq" placeholder="Ask about this note" autocomplete="off" aria-label="Question">
-        <button class="btn primary" id="askbtn">Ask</button>
-      </form>
-    </div>
+    <div class="card" id="n-tx"></div>
+    <details class="card">
+      <summary>Edit transcript</summary>
+      <textarea id="tx-edit" placeholder="Type or paste what was said, one line per sentence…"></textarea>
+      <div class="row"><button class="btn" id="tx-save">Save transcript</button></div>
+    </details>
   </section>
 </div>
 
 <div class="dock" id="dock">
-  <button class="sidebtn" id="btn-paste">Paste text</button>
+  <span class="spacer" aria-hidden="true"></span>
   <button class="recbtn" id="btn-rec" aria-label="Start recording"><span></span></button>
   <button class="sidebtn" id="btn-upload">Import audio</button>
   <input type="file" id="file" accept="audio/*" hidden>
@@ -229,11 +173,10 @@ audio { width: 100%; }
 "use strict";
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = (s) => { s = Math.max(0, Math.round(s)); const m = Math.floor(s / 60), r = s % 60; return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0"); };
+const fmt = (s) => { s = Math.max(0, Math.round(s || 0)); const m = Math.floor(s / 60), r = s % 60; return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0"); };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const STYLES = { meeting: "Meeting", lecture: "Lecture", memo: "Quick memo", interview: "Interview" };
 let toastT;
-function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2200); }
+function toast(html, ms) { const t = $("#toast"); t.innerHTML = html; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), ms || 2400); }
 
 /* ---------- storage ---------- */
 const KEY = "earmark.notes.v1", SEEDED = "earmark.seeded.v1";
@@ -253,101 +196,39 @@ async function putAudio(id, blob) { const db = await openIdb(); if (!db) return;
 async function getAudio(id) { const db = await openIdb(); if (!db) return null; return new Promise((res) => { try { const r = db.transaction("a").objectStore("a").get(id); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); } catch { res(null); } }); }
 async function delAudio(id) { const db = await openIdb(); if (!db) return; try { db.transaction("a", "readwrite").objectStore("a").delete(id); } catch {} }
 
-const EXAMPLES = [
-  { id: "ex1", example: true, created: Date.now() - 3600e3 * 26, duration: 412, style: "meeting",
-    transcript: [
-      { t: 0, text: "Okay, let's get started. This is the Thursday sync for the spring catalog launch." },
-      { t: 9, text: "Priya, where are we on product photography?" },
-      { t: 14, text: "We shot forty of the sixty items. The remaining twenty need the studio again, and the earliest slot is March 11th." },
-      { t: 31, text: "That's tight. The site freeze is March 18th, so retouching has a week." },
-      { t: 44, text: "Marco can take retouching if we send files the same day. I'll book the studio today." },
-      { t: 62, text: "Good. Next, pricing. Finance wants the new ceramics line at 10 percent above last year." },
-      { t: 80, text: "I think that's fine for mugs but the large planters are already our most expensive items. We should hold those flat." },
-      { t: 101, text: "Agreed, let's propose holding planters flat. Dana, can you draft that note to finance by Monday?" },
-      { t: 112, text: "Yes, I'll send it Monday morning." },
-      { t: 118, text: "Last thing, the email campaign. We decided to move the launch email from Tuesday to Wednesday because of the holiday." },
-      { t: 133, text: "I'll update the schedule in the email tool and tell the agency." },
-      { t: 140, text: "Great, thanks everyone. Same time next week." }
-    ],
-    ai: { title: "Spring catalog launch sync",
-      summary: "The team reviewed progress on the spring catalog launch. Photography is two-thirds done, with the remaining 20 items shooting on March 11 ahead of the March 18 site freeze. Ceramics pricing goes up 10%, but the team will propose holding large planters flat. The launch email moves to Wednesday because of the holiday.",
-      keyPoints: ["40 of 60 products photographed; studio needed again March 11", "Site freeze is March 18, leaving one week for retouching", "Ceramics up 10%, large planters proposed to stay flat", "Launch email moves from Tuesday to Wednesday"],
-      actionItems: ["Priya: book the studio for March 11 today", "Marco: retouch files the same day they arrive", "Dana: send pricing note to finance by Monday morning", "Update email schedule and tell the agency"],
-      tags: ["launch", "pricing", "photography"] }, done: {} },
-  { id: "ex2", example: true, created: Date.now() - 3600e3 * 72, duration: 74, style: "memo",
-    transcript: [
-      { t: 0, text: "Note to self after the dentist. Next cleaning is in six months, so roughly early May." },
-      { t: 8, text: "They recommended switching to a soft-bristle brush and flossing at night instead of the morning." },
-      { t: 19, text: "Also remember to call insurance about whether the crown is covered. The claim number is on the paper receipt in my bag." },
-      { t: 34, text: "And pick up the prescription mouthwash from the pharmacy before Friday." }
-    ],
-    ai: { title: "Dentist follow-ups",
-      summary: "Notes after a dental visit: next cleaning is due around early May, with advice to use a soft brush and floss at night. Two errands remain: check crown coverage with insurance and pick up the prescription mouthwash.",
-      keyPoints: ["Next cleaning in about six months (early May)", "Switch to a soft-bristle brush", "Floss at night instead of the morning"],
-      actionItems: ["Call insurance about crown coverage (claim number on receipt)", "Pick up prescription mouthwash before Friday", "Book the May cleaning"],
-      tags: ["health", "errands"] }, done: {} }
-];
+const EXAMPLE = { id: "ex1", example: true, title: "Spring catalog launch sync", created: Date.now() - 3600e3 * 26, duration: 146,
+  transcript: [
+    { t: 0, text: "Okay, let's get started. This is the Thursday sync for the spring catalog launch." },
+    { t: 9, text: "Priya, where are we on product photography?" },
+    { t: 14, text: "We shot forty of the sixty items. The remaining twenty need the studio again, and the earliest slot is March 11th." },
+    { t: 31, text: "That's tight. The site freeze is March 18th, so retouching has a week." },
+    { t: 44, text: "Marco can take retouching if we send files the same day. I'll book the studio today." },
+    { t: 62, text: "Next, pricing. Finance wants the new ceramics line at 10 percent above last year, but we should hold the large planters flat." },
+    { t: 101, text: "Dana, can you draft that note to finance by Monday? Yes, I'll send it Monday morning." },
+    { t: 118, text: "Last thing, we're moving the launch email from Tuesday to Wednesday because of the holiday." }
+  ] };
 function seed() {
   let seeded = false; try { seeded = localStorage.getItem(SEEDED) === "1"; } catch {}
-  if (!seeded && notes.length === 0) { notes = EXAMPLES.slice(); save(); try { localStorage.setItem(SEEDED, "1"); } catch {} }
-  if (notes.length === 0 && !seeded) notes = EXAMPLES.slice();
+  if (!seeded && notes.length === 0) { notes = [EXAMPLE]; save(); try { localStorage.setItem(SEEDED, "1"); } catch {} }
 }
-
-/* ---------- Claude (sample) ---------- */
-let samplePromise = null;
-function getSample() {
-  if (!samplePromise) samplePromise = (async () => { try { if (!window.claude || !window.claude.use) return null; return await window.claude.use("sample"); } catch { return null; } })();
-  return samplePromise;
-}
-const STYLE_HINT = {
-  meeting: "This is a meeting. Focus on decisions, owners and deadlines.",
-  lecture: "This is a lecture or class. Focus on concepts, definitions and things to study; action items are study tasks.",
-  memo: "This is a short personal voice memo. Keep it brief; action items are reminders.",
-  interview: "This is an interview. Focus on what the interviewee said, notable quotes and follow-up questions."
-};
-function txText(n) { return n.transcript.map((s) => "[" + fmt(s.t) + "] " + s.text).join("\n"); }
-async function aiSummarize(n) {
-  const sample = await getSample();
-  if (sample) {
-    try {
-      const out = await sample.json(
-        "You turn voice-note transcripts into notes. " + (STYLE_HINT[n.style] || "") +
-        "\nReply with only JSON of this shape: {\"title\": string (max 6 words), \"summary\": string (2-4 sentences), \"keyPoints\": string[] (3-6 items), \"actionItems\": string[] (0-6 items, include owner and date when said), \"tags\": string[] (1-3 lowercase words)}." +
-        "\n\nTranscript:\n" + txText(n).slice(0, 60000),
-        { cache: false });
-      if (out && typeof out === "object" && out.summary) return { ...normalize(out), by: "claude" };
-    } catch (e) {
-      if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) toast("Claude isn't allowed here, so Earmark made a basic summary.");
-      else if (e && e.code === "rate_limited") toast("Too many requests right now. Made a basic summary instead.");
-    }
-  }
-  return { ...localSummary(n), by: "local" };
-}
-function normalize(o) {
-  const arr = (v) => (Array.isArray(v) ? v.map(String).filter(Boolean) : []);
-  return { title: String(o.title || "Untitled note").slice(0, 80), summary: String(o.summary || ""), keyPoints: arr(o.keyPoints), actionItems: arr(o.actionItems), tags: arr(o.tags).slice(0, 4) };
-}
-function localSummary(n) {
-  const sents = n.transcript.map((s) => s.text).join(" ").split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
-  const actionRe = /\b(i'll|i will|we'll|need to|needs to|should|remember to|don't forget|have to|todo|to-do|by (monday|tuesday|wednesday|thursday|friday|tomorrow|next week))\b/i;
-  const actions = sents.filter((s) => actionRe.test(s)).slice(0, 6);
-  const scored = sents.map((s, i) => ({ s, w: s.split(/\s+/).length + (/\d/.test(s) ? 6 : 0) - i * 0.2 })).sort((a, b) => b.w - a.w).slice(0, 4).map((x) => x.s);
-  const words = (sents[0] || "Voice note").replace(/[^\w\s']/g, "").split(/\s+/).slice(0, 6).join(" ");
-  return { title: words || "Voice note", summary: sents.slice(0, 2).join(" "), keyPoints: scored, actionItems: actions, tags: [] };
+function titleOf(n) { return n.title || n.ai?.title || autoTitle(n); }
+function autoTitle(n) {
+  const first = (n.transcript[0]?.text || "").replace(/[^\w\s']/g, "").split(/\s+/).filter(Boolean).slice(0, 6).join(" ");
+  return first || "Recording " + new Date(n.created).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
 /* ---------- routing ---------- */
 let current = null;
 function show(view) {
-  for (const v of ["list", "rec", "paste", "note"]) $("#view-" + v).hidden = v !== view;
-  $("#dock").hidden = !(view === "list" || view === "rec");
-  $("#btn-paste").hidden = $("#btn-upload").hidden = view === "rec";
+  for (const v of ["list", "rec", "note"]) $("#view-" + v).hidden = v !== view;
+  $("#dock").hidden = view === "note";
+  $("#btn-upload").hidden = view === "rec";
   window.scrollTo(0, 0);
 }
-document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => { abortAsk(); renderList(); show("list"); }));
+$("#n-back").addEventListener("click", () => { renderList(); show("list"); });
 
 /* ---------- list ---------- */
-function preview(n) { return n.ai?.summary || n.transcript.map((s) => s.text).join(" ") || "No words captured"; }
+const plain = (n) => n.transcript.map((s) => s.text).join(" ");
 function when(ts) {
   const d = new Date(ts), now = new Date(), y = new Date(now); y.setDate(now.getDate() - 1);
   const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -357,37 +238,30 @@ function when(ts) {
 }
 function renderList() {
   const q = $("#q").value.trim().toLowerCase();
-  const list = notes.slice().sort((a, b) => b.created - a.created).filter((n) => !q || (n.ai?.title + " " + preview(n) + " " + n.transcript.map((s) => s.text).join(" ")).toLowerCase().includes(q));
+  const list = notes.slice().sort((a, b) => b.created - a.created).filter((n) => !q || (titleOf(n) + " " + plain(n)).toLowerCase().includes(q));
   $("#count").textContent = notes.length ? notes.length + (notes.length === 1 ? " note" : " notes") : "";
   const box = $("#notes");
   if (!list.length) {
-    box.innerHTML = '<div class="empty">' + (q ? "No notes match “" + esc(q) + "”." : "No notes yet. Tap the red button to record your first one, or paste a transcript.") + "</div>";
+    box.innerHTML = '<div class="empty">' + (q ? "No notes match “" + esc(q) + "”." : "No notes yet. Tap the red button to record your first one.") + "</div>";
     return;
   }
   box.innerHTML = list.map((n) =>
-    '<button class="note-row" data-id="' + esc(n.id) + '"><span class="t">' + esc(n.ai?.title || "Processing…") +
-    (n.example ? '<span class="pill ex">Example</span>' : "") + '</span><span class="d mono">' + fmt(n.duration) +
-    '</span><span class="p">' + esc(preview(n)) + '</span><span class="d">' + esc(when(n.created)) + (n.ai?.tags?.length ? " · " + esc(n.ai.tags.join(", ")) : "") + "</span></button>").join("");
+    '<button class="note-row" data-id="' + esc(n.id) + '"><span class="t"><span>' + esc(titleOf(n)) + "</span>" +
+    (n.example ? '<span class="pill">Example</span>' : "") + '</span><span class="d mono">' + fmt(n.duration) +
+    '</span><span class="p">' + esc(plain(n) || "No transcript yet") + '</span><span class="d">' + esc(when(n.created)) + "</span></button>").join("");
   box.querySelectorAll(".note-row").forEach((b) => b.addEventListener("click", () => openNote(b.dataset.id)));
 }
 $("#q").addEventListener("input", renderList);
 
-/* ---------- style chips ---------- */
-let pickedStyle = "meeting";
-function renderStyles(el) {
-  el.innerHTML = Object.entries(STYLES).map(([k, v]) => '<button class="chipbtn" data-s="' + k + '" aria-pressed="' + (k === pickedStyle) + '">' + v + "</button>").join("");
-  el.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { pickedStyle = b.dataset.s; renderStyles(el); }));
-}
-
 /* ---------- recorder ---------- */
-const R = { stream: null, mr: null, chunks: [], ctx: null, an: null, raf: 0, start: 0, elapsed: 0, timer: 0, sr: null, segs: [], interim: "", live: false, paused: false, levels: [] };
+const R = { stream: null, mr: null, chunks: [], ctx: null, an: null, raf: 0, start: 0, elapsed: 0, timer: 0, sr: null, segs: [], interim: "", live: false, levels: [] };
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 $("#btn-rec").addEventListener("click", () => {
   if ($("#view-rec").hidden) startRecording();
   else if (R.live) stopRecording(true);
 });
-$("#rec-cancel").addEventListener("click", () => { stopRecording(false); renderList(); show("list"); });
+$("#rec-cancel").addEventListener("click", () => { stopRecording(false); $("#dock").hidden = false; renderList(); show("list"); });
 
 function setStatus(txt, on) { $("#rec-status").textContent = txt; $("#rec-dot").classList.toggle("on", !!on); $("#btn-rec").classList.toggle("live", !!on); $("#btn-rec").setAttribute("aria-label", on ? "Stop and save" : "Start recording"); }
 
@@ -396,7 +270,6 @@ async function startRecording() {
   $("#clock").textContent = "00:00";
   $("#live-tx").innerHTML = '<span class="muted">Words appear here as you talk.</span>';
   $("#rec-notice").hidden = true;
-  renderStyles($("#rec-styles"));
   show("rec");
   setStatus("Starting…", false);
   try {
@@ -406,11 +279,10 @@ async function startRecording() {
     setStatus("No microphone", false);
     $("#dock").hidden = true;
     const n = $("#rec-notice"); n.hidden = false;
-    n.innerHTML = "Earmark can’t reach the microphone in this window. Open the app on its own page in Safari or Chrome and allow microphone access, or <button class=\"btn\" id=\"go-paste\" style=\"margin-top:8px\">Paste a transcript instead</button>";
-    $("#go-paste").addEventListener("click", openPaste);
+    n.textContent = "Earmark can’t reach the microphone. On iPhone, go to Settings → Safari → Microphone and choose Ask or Allow, then try again.";
     return;
   }
-  const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/aac"].find((m) => window.MediaRecorder?.isTypeSupported?.(m)) || "";
+  const mime = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/aac"].find((m) => window.MediaRecorder?.isTypeSupported?.(m)) || "";
   try { R.mr = new MediaRecorder(R.stream, mime ? { mimeType: mime } : undefined); } catch { R.mr = null; }
   if (R.mr) { R.mr.ondataavailable = (e) => e.data.size && R.chunks.push(e.data); R.mr.start(1000); }
   try {
@@ -427,7 +299,7 @@ async function startRecording() {
 function curTime() { return R.elapsed + (R.live ? (performance.now() - R.start) / 1000 : 0); }
 
 function startSpeech() {
-  if (!SR) { const n = $("#rec-notice"); n.hidden = false; n.textContent = "This browser records audio but can’t transcribe live. The audio is still saved; paste a transcript later from the note."; return; }
+  if (!SR) { const n = $("#rec-notice"); n.hidden = false; n.textContent = "This browser records audio but can’t transcribe live. The audio is still saved, and you can type the transcript in the note."; return; }
   const sr = new SR(); R.sr = sr;
   sr.continuous = true; sr.interimResults = true; sr.lang = navigator.language || "en-US";
   let segStart = curTime();
@@ -436,7 +308,7 @@ function startSpeech() {
     for (let i = ev.resultIndex; i < ev.results.length; i++) {
       const r = ev.results[i];
       if (r.isFinal) { const text = r[0].transcript.trim(); if (text) R.segs.push({ t: Math.floor(segStart), text: text.charAt(0).toUpperCase() + text.slice(1) }); segStart = curTime(); }
-      else { if (!interim) segStart = segStart || curTime(); interim += r[0].transcript; }
+      else interim += r[0].transcript;
     }
     R.interim = interim; renderLive();
   };
@@ -448,7 +320,7 @@ function renderLive() {
   const box = $("#live-tx");
   const segs = R.segs.map((s) => '<div class="seg"><span class="ts">' + fmt(s.t) + "</span><span>" + esc(s.text) + "</span></div>").join("");
   const interim = R.interim ? '<div class="seg"><span class="ts">' + fmt(curTime()) + '</span><span class="interim">' + esc(R.interim) + "</span></div>" : "";
-  box.innerHTML = segs + interim || '<span class="muted">Listening…</span>';
+  box.innerHTML = (segs + interim) || '<span class="muted">Listening…</span>';
   box.scrollTop = box.scrollHeight;
 }
 function drawWave() {
@@ -463,9 +335,9 @@ function drawWave() {
     if (buf) { R.an.getByteTimeDomainData(buf); let sum = 0; for (const v of buf) { const x = (v - 128) / 128; sum += x * x; } lvl = Math.min(1, Math.sqrt(sum / buf.length) * 4); }
     R.levels.push(lvl); const bars = Math.floor(w / 5); if (R.levels.length > bars) R.levels.splice(0, R.levels.length - bars);
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-    const ink = css.getPropertyValue("--rec").trim(), dim = css.getPropertyValue("--line").trim();
+    const rec = css.getPropertyValue("--rec").trim(), ink = css.getPropertyValue("--ink").trim(), dim = css.getPropertyValue("--line").trim();
     g.fillStyle = dim; g.fillRect(0, h / 2 - 0.5, w, 1);
-    R.levels.forEach((l, i) => { const bh = Math.max(2, l * (h - 12)); g.fillStyle = i > R.levels.length - 4 ? ink : css.getPropertyValue("--ink").trim(); g.globalAlpha = 0.35 + 0.65 * (i / R.levels.length); g.fillRect(w - (R.levels.length - i) * 5, (h - bh) / 2, 3, bh); });
+    R.levels.forEach((l, i) => { const bh = Math.max(2, l * (h - 12)); g.fillStyle = i > R.levels.length - 4 ? rec : ink; g.globalAlpha = 0.35 + 0.65 * (i / R.levels.length); g.fillRect(w - (R.levels.length - i) * 5, (h - bh) / 2, 3, bh); });
     g.globalAlpha = 1;
     R.raf = requestAnimationFrame(step);
   };
@@ -475,110 +347,82 @@ function stopRecording(keep) {
   const duration = curTime();
   R.live = false; clearInterval(R.timer); cancelAnimationFrame(R.raf);
   const sr = R.sr; R.sr = null; try { sr && sr.stop(); } catch {}
-  if (R.interim.trim()) { R.segs.push({ t: Math.floor(duration - 3), text: R.interim.trim() }); R.interim = ""; }
+  if (R.interim.trim()) { R.segs.push({ t: Math.max(0, Math.floor(duration - 3)), text: R.interim.trim() }); R.interim = ""; }
   const finish = () => {
     R.stream?.getTracks().forEach((t) => t.stop()); R.stream = null;
     try { R.ctx && R.ctx.close(); } catch {}
     setStatus("Ready", false);
     if (!keep) return;
-    const n = { id: uid(), created: Date.now(), duration, style: pickedStyle, transcript: R.segs.slice(), ai: null, done: {}, hasAudio: false };
-    if (R.chunks.length) { n.hasAudio = true; putAudio(n.id, new Blob(R.chunks, { type: R.mr?.mimeType || "audio/webm" })); }
-    addNote(n);
+    const n = { id: uid(), created: Date.now(), duration, transcript: R.segs.slice(), hasAudio: false };
+    if (R.chunks.length) { n.hasAudio = true; putAudio(n.id, new Blob(R.chunks, { type: R.mr?.mimeType || "audio/mp4" })); }
+    notes.push(n); save(); openNote(n.id);
   };
   if (R.mr && R.mr.state !== "inactive") { R.mr.onstop = finish; try { R.mr.stop(); } catch { finish(); } }
   else finish();
 }
 
-/* ---------- paste / import ---------- */
-function openPaste() { stopRecording(false); renderStyles($("#paste-styles")); $("#paste-text").value = ""; show("paste"); $("#paste-text").focus(); }
-$("#btn-paste").addEventListener("click", openPaste);
-$("#paste-save").addEventListener("click", () => {
-  const raw = $("#paste-text").value.trim();
-  if (raw.length < 20) { toast("Add a few sentences first."); return; }
-  const parts = raw.split(/\n+|(?<=[.!?])\s+(?=[A-Z])/).map((s) => s.trim()).filter(Boolean);
-  const wpm = 150; let t = 0;
-  const transcript = parts.map((p) => { const seg = { t: Math.round(t), text: p }; t += (p.split(/\s+/).length / wpm) * 60; return seg; });
-  addNote({ id: uid(), created: Date.now(), duration: t, style: pickedStyle, transcript, ai: null, done: {}, hasAudio: false });
-});
+/* ---------- import ---------- */
 $("#btn-upload").addEventListener("click", () => $("#file").click());
 $("#file").addEventListener("change", async (e) => {
   const f = e.target.files[0]; e.target.value = ""; if (!f) return;
   const dur = await new Promise((res) => { const a = new Audio(); a.preload = "metadata"; a.onloadedmetadata = () => res(isFinite(a.duration) ? a.duration : 0); a.onerror = () => res(0); a.src = URL.createObjectURL(f); });
-  const n = { id: uid(), created: Date.now(), duration: dur, style: "memo", transcript: [], ai: { title: f.name.replace(/\.[^.]+$/, "").slice(0, 60), summary: "", keyPoints: [], actionItems: [], tags: [], by: "none" }, done: {}, hasAudio: true, imported: true };
+  const n = { id: uid(), created: Date.now(), duration: dur, title: f.name.replace(/\.[^.]+$/, "").slice(0, 60), transcript: [], hasAudio: true };
   await putAudio(n.id, f);
-  notes.push(n); save(); openNote(n.id); setTab("transcript");
+  notes.push(n); save(); openNote(n.id);
 });
 
 /* ---------- note ---------- */
-async function addNote(n) {
-  notes.push(n); save(); openNote(n.id);
-  if (!n.transcript.length) { n.ai = { title: "Recording " + when(n.created), summary: "", keyPoints: [], actionItems: [], tags: [], by: "none" }; save(); renderNote(); return; }
-  await summarize(n);
-}
-async function summarize(n) {
-  n.busy = true; renderNote();
-  const ai = await aiSummarize(n);
-  n.ai = ai; delete n.busy; n.done = {}; save();
-  if (current === n.id) renderNote();
-}
-let tab = "summary", audioUrl = null;
+let audioUrl = null;
 async function openNote(id) {
-  current = id; tab = "summary"; chatTurns = []; abortAsk();
-  show("note"); renderNote(); renderChat();
+  current = id;
+  show("note"); renderNote();
   const n = notes.find((x) => x.id === id); const a = $("#n-audio");
   if (audioUrl) { URL.revokeObjectURL(audioUrl); audioUrl = null; }
   a.hidden = true; a.removeAttribute("src");
   if (n?.hasAudio) { const blob = await getAudio(id); if (blob && current === id) { audioUrl = URL.createObjectURL(blob); a.src = audioUrl; a.hidden = false; } }
 }
-function setTab(t) { tab = t; document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === t)); for (const k of ["summary", "transcript", "ask"]) $("#tab-" + k).hidden = k !== t; }
-document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
-
 function renderNote() {
   const n = notes.find((x) => x.id === current); if (!n) return;
-  $("#n-title").textContent = n.busy ? "Summarizing…" : (n.ai?.title || "Untitled note");
+  $("#n-title").textContent = titleOf(n);
   const words = n.transcript.reduce((a, s) => a + s.text.split(/\s+/).length, 0);
-  $("#n-meta").innerHTML = "<span>" + esc(new Date(n.created).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })) + '</span><span class="mono">' + fmt(n.duration) + "</span><span>" + words.toLocaleString() + " words</span><span>" + esc(STYLES[n.style] || "") + "</span>" + (n.example ? '<span class="pill ex" style="margin:0">Example</span>' : "");
-  setTab(tab);
-
-  const S = $("#tab-summary");
-  if (n.busy) S.innerHTML = '<div class="card"><div class="thinking">Writing the summary, key points and to-dos…</div></div>';
-  else if (!n.transcript.length) S.innerHTML = '<div class="card"><p>This note has audio but no transcript yet.</p><p class="muted small">Open the Transcript tab and paste or type what was said, then Earmark can summarize it.</p></div>';
-  else {
-    const a = n.ai || {};
-    S.innerHTML =
-      (a.tags?.length ? '<div class="tags">' + a.tags.map((t) => '<span class="tag">#' + esc(t) + "</span>").join("") + "</div>" : "") +
-      '<div class="card"><div class="label">Summary</div><p>' + esc(a.summary) + "</p></div>" +
-      (a.keyPoints?.length ? '<div class="card"><div class="label">Key points</div><ul>' + a.keyPoints.map((k) => "<li>" + esc(k) + "</li>").join("") + "</ul></div>" : "") +
-      (a.actionItems?.length ? '<div class="card"><div class="label">To-dos</div><ul class="todo">' + a.actionItems.map((k, i) => '<li class="' + (n.done?.[i] ? "done" : "") + '"><input type="checkbox" id="todo-' + i + '" data-i="' + i + '"' + (n.done?.[i] ? " checked" : "") + '><label for="todo-' + i + '"><span><mark>' + esc(k) + "</mark></span></label></li>").join("") + "</ul></div>" : "") +
-      '<div class="card"><div class="label">Restyle</div><div class="styles" id="re-styles"></div><div class="row"><button class="btn" id="regen">Summarize again</button><span class="small muted">' + (a.by === "claude" ? "Written by Claude" : a.by === "local" ? "Basic summary (Claude unavailable)" : "") + "</span></div></div>";
-    S.querySelectorAll(".todo input").forEach((c) => c.addEventListener("change", () => { n.done = n.done || {}; n.done[c.dataset.i] = c.checked; c.closest("li").classList.toggle("done", c.checked); save(); }));
-    pickedStyle = n.style || "meeting"; renderStyles($("#re-styles"));
-    $("#regen").addEventListener("click", () => { n.style = pickedStyle; summarize(n); });
-  }
-
-  const T = $("#tab-transcript");
-  T.innerHTML = (n.transcript.length
-    ? '<div class="card"><div class="tx-list">' + n.transcript.map((s) => '<div class="seg"><button class="ts" data-t="' + s.t + '" aria-label="Play from ' + fmt(s.t) + '">' + fmt(s.t) + "</button><span>" + esc(s.text) + "</span></div>").join("") + "</div></div>"
-    : "") +
-    '<div class="card"><div class="label">' + (n.transcript.length ? "Replace transcript" : "Add transcript") + '</div><textarea id="tx-edit" placeholder="Paste or type what was said…">' + esc(n.transcript.map((s) => s.text).join("\n")) + '</textarea><div class="row"><button class="btn primary" id="tx-save">Save and summarize</button></div></div>';
+  $("#n-meta").innerHTML = "<span>" + esc(new Date(n.created).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })) + '</span><span class="mono">' + fmt(n.duration) + "</span><span>" + words.toLocaleString() + " words</span>" + (n.example ? '<span class="pill">Example</span>' : "");
+  $("#n-send").disabled = !n.transcript.length;
+  const T = $("#n-tx");
+  T.innerHTML = n.transcript.length
+    ? '<div class="label">Transcript</div>' + n.transcript.map((s) => '<div class="seg"><button class="ts" data-t="' + s.t + '" aria-label="Play from ' + fmt(s.t) + '">' + fmt(s.t) + "</button><span>" + esc(s.text) + "</span></div>").join("")
+    : '<p class="muted" style="margin:0">No words were captured. Open “Edit transcript” below to type what was said.</p>';
   T.querySelectorAll(".ts").forEach((b) => b.addEventListener("click", () => { const a = $("#n-audio"); if (!a.hidden) { a.currentTime = Number(b.dataset.t); a.play().catch(() => {}); } }));
-  $("#tx-save").addEventListener("click", () => {
-    const lines = $("#tx-edit").value.split(/\n+/).map((s) => s.trim()).filter(Boolean);
-    if (!lines.length) { toast("Add some text first."); return; }
-    const old = n.transcript; const span = n.duration || lines.length * 8;
-    n.transcript = lines.map((text, i) => ({ t: old[i]?.t ?? Math.round((i / lines.length) * span), text }));
-    delete n.example; tab = "summary"; save(); summarize(n);
-  });
-
-  $("#suggest").innerHTML = ["What were the decisions?", "Who owns what?", "Draft a follow-up email"].map((q) => '<button class="chipbtn">' + q + "</button>").join("");
-  $("#suggest").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { $("#askq").value = b.textContent; ask(); }));
+  $("#tx-edit").value = n.transcript.map((s) => s.text).join("\n");
 }
-
-$("#n-copy").addEventListener("click", async () => {
-  const n = notes.find((x) => x.id === current); if (!n) return; const a = n.ai || {};
-  const md = "# " + (a.title || "Note") + "\n\n" + (a.summary || "") + "\n\n" + (a.keyPoints?.length ? "## Key points\n" + a.keyPoints.map((k) => "- " + k).join("\n") + "\n\n" : "") + (a.actionItems?.length ? "## To-dos\n" + a.actionItems.map((k, i) => "- [" + (n.done?.[i] ? "x" : " ") + "] " + k).join("\n") + "\n\n" : "") + "## Transcript\n" + txText(n);
-  try { await navigator.clipboard.writeText(md); toast("Copied as Markdown"); } catch { toast("Copy isn't allowed here. Select the text in the Transcript tab instead."); }
+$("#tx-save").addEventListener("click", () => {
+  const n = notes.find((x) => x.id === current); if (!n) return;
+  const lines = $("#tx-edit").value.split(/\n+/).map((s) => s.trim()).filter(Boolean);
+  const old = n.transcript; const span = n.duration || lines.length * 8;
+  n.transcript = lines.map((text, i) => ({ t: old[i]?.t ?? Math.round((i / Math.max(1, lines.length)) * span), text }));
+  delete n.example; save(); renderNote(); toast("Transcript saved");
 });
+
+/* ---------- send to Claude ---------- */
+function transcriptText(n) {
+  const head = "Transcript of my voice note “" + titleOf(n) + "” (" + new Date(n.created).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) + ", " + fmt(n.duration) + "):";
+  return head + "\n\n" + n.transcript.map((s) => "[" + fmt(s.t) + "] " + s.text).join("\n");
+}
+$("#n-send").addEventListener("click", async () => {
+  const n = notes.find((x) => x.id === current); if (!n || !n.transcript.length) return;
+  const text = transcriptText(n);
+  if (navigator.share) {
+    try { await navigator.share({ text }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Transcript copied. <a href="https://claude.ai/new" target="_blank" rel="noopener">Open Claude</a> and paste it.', 6000);
+  } catch {
+    $("#tx-edit").closest("details").open = true; $("#tx-edit").select();
+    toast("Couldn’t copy automatically. The transcript is selected below; copy it and paste it into Claude.", 6000);
+  }
+});
+
 let delArmed = 0;
 $("#n-del").addEventListener("click", () => {
   const b = $("#n-del");
@@ -587,39 +431,9 @@ $("#n-del").addEventListener("click", () => {
   current = null; renderList(); show("list"); toast("Note deleted");
 });
 
-/* ---------- ask ---------- */
-let chatTurns = [], askCtl = null;
-function abortAsk() { try { askCtl?.abort(); } catch {} askCtl = null; }
-function renderChat(streaming) {
-  const c = $("#chat");
-  c.innerHTML = chatTurns.length ? chatTurns.map((t) => '<div class="bubble ' + (t.role === "user" ? "me" : "ai") + '">' + esc(t.content) + "</div>").join("") : '<p class="muted small" style="margin:0">Ask anything about this recording: decisions, numbers, who said what, or a draft follow-up.</p>';
-  if (streaming !== undefined) { const b = document.createElement("div"); b.className = "bubble ai"; b.id = "streaming"; if (streaming) b.textContent = streaming; else b.innerHTML = '<span class="thinking">Thinking…</span>'; c.append(b); }
-}
-$("#askform").addEventListener("submit", (e) => { e.preventDefault(); ask(); });
-async function ask() {
-  const q = $("#askq").value.trim(); const n = notes.find((x) => x.id === current); if (!q || !n || askCtl) return;
-  $("#askq").value = ""; chatTurns.push({ role: "user", content: q }); renderChat("");
-  const sample = await getSample();
-  if (!sample) { chatTurns.push({ role: "assistant", content: localAnswer(n, q) }); renderChat(); return; }
-  const rules = "You answer questions about one voice note. Use only the transcript below; say so when it doesn't contain the answer. Cite timestamps like [01:23] when useful. Keep answers short and plain, no Markdown headings.\n\nTranscript:\n" + txText(n).slice(0, 60000);
-  askCtl = new AbortController(); $("#askbtn").disabled = true;
-  try {
-    const { text } = await sample([{ role: "user", content: rules }, ...chatTurns.slice(-10)], { cache: false, signal: askCtl.signal, onText: ({ text }) => { const s = $("#streaming"); if (s) s.textContent = text; } });
-    chatTurns.push({ role: "assistant", content: text });
-  } catch (e) {
-    if (e?.code !== "cancelled") chatTurns.push({ role: "assistant", content: (e?.text ? e.text + "\n\n" : "") + (e?.code === "not_granted" || e?.code === "sampling_disabled" ? localAnswer(n, q) : e?.code === "rate_limited" ? "Too many questions at once. Try again in a minute." : "That answer didn't come through. Ask again.") });
-  } finally { askCtl = null; $("#askbtn").disabled = false; renderChat(); }
-}
-function localAnswer(n, q) {
-  const words = q.toLowerCase().match(/[a-z0-9']{4,}/g) || [];
-  const hits = n.transcript.filter((s) => words.some((w) => s.text.toLowerCase().includes(w))).slice(0, 4);
-  return "Claude isn't available in this window, so here are the closest lines from the transcript:\n" + (hits.length ? hits.map((s) => "[" + fmt(s.t) + "] " + s.text).join("\n") : "No lines matched those words.");
-}
-
 /* ---------- boot ---------- */
 load(); seed(); renderList(); show("list");
 })();
 </script>
-
 </body>
 </html>
